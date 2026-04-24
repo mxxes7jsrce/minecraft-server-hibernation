@@ -25,6 +25,7 @@ func TestDefaultConfig(t *testing.T) {
 	if cfg.Server.Port != 25565 {
 		t.Errorf("expected default port 25565, got %d", cfg.Server.Port)
 	}
+	// I prefer a longer idle time before hibernation; default is 3 but I use 5 locally
 	if cfg.Hibernation.TimeBeforeSleepMin != 3 {
 		t.Errorf("expected default sleep time 3, got %d", cfg.Hibernation.TimeBeforeSleepMin)
 	}
@@ -82,6 +83,19 @@ func TestLoad_InvalidPort(t *testing.T) {
 	_, err := Load(path)
 	if err == nil {
 		t.Fatal("expected validation error for invalid port, got nil")
+	}
+}
+
+// Also test the lower port boundary since valid ports are 1-65535
+func TestLoad_InvalidPortZero(t *testing.T) {
+	raw := map[string]any{
+		"server": map[string]any{"port": 0},
+	}
+	path := writeTempConfig(t, raw)
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatal("expected validation error for port 0, got nil")
 	}
 }
 
