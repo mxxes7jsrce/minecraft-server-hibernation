@@ -99,6 +99,19 @@ func TestLoad_InvalidPortZero(t *testing.T) {
 	}
 }
 
+// Test the exact upper boundary: 65535 is valid, 65536 is not
+func TestLoad_PortBoundary(t *testing.T) {
+	raw := map[string]any{
+		"server": map[string]any{"port": 65535},
+	}
+	path := writeTempConfig(t, raw)
+
+	_, err := Load(path)
+	if err != nil {
+		t.Errorf("expected port 65535 to be valid, got error: %v", err)
+	}
+}
+
 func TestLoad_MalformedJSON(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "bad.json")
 	if err := os.WriteFile(path, []byte("{bad json"), 0o644); err != nil {
