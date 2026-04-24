@@ -48,12 +48,14 @@ func DefaultConfig() *Config {
 			Version:      "1.20.1",
 			Protocol:     763,
 			MaxPlayers:   20,
-			Motd:         "Server is hibernating...",
+			// Customized MOTD to make it clearer the server will start on join
+			Motd:         "Hibernating - join to wake the server!",
 			StartCommand: "",
 			StopCommand:  "",
 		},
 		Hibernation: HibernationConfig{
-			TimeBeforeSleepMin: 3,
+			// Bumped to 5 minutes to avoid thrashing on my low-spec home server
+			TimeBeforeSleepMin: 5,
 			NotifyEnabled:      true,
 			NotifyMessage:      "Server is starting, please wait...",
 		},
