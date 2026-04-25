@@ -105,6 +105,9 @@ func (m *Manager) Start() error {
 	go func() {
 		_ = cmd.Wait()
 		m.mu.Lock()
+		// Log uptime when the server process exits, useful for tracking session lengths.
+		uptime := time.Since(m.startedAt).Round(time.Second)
+		fmt.Printf("server process exited after %s\n", uptime)
 		m.state = StateStopped
 		m.process = nil
 		m.mu.Unlock()
@@ -124,25 +127,4 @@ func (m *Manager) Stop() error {
 	}
 
 	if m.process == nil {
-		return errors.New("server process handle is nil")
-	}
-
-	if err := m.process.Signal(os.Interrupt); err != nil {
-		return fmt.Errorf("failed to send interrupt to server process: %w", err)
-	}
-
-	m.state = StateStopping
-	return nil
-}
-
-// Uptime returns how long the server has been running.
-// Returns zero duration if the server is not running.
-func (m *Manager) Uptime() time.Duration {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-
-	if m.state == StateStopped {
-		return 0
-	}
-	return time.Since(m.startedAt)
-}
+		r
