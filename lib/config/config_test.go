@@ -112,13 +112,22 @@ func TestLoad_PortBoundary(t *testing.T) {
 	}
 }
 
+// Test port 65536, which is one above the valid maximum
+func TestLoad_PortJustAboveBoundary(t *testing.T) {
+	raw := map[string]any{
+		"server": map[string]any{"port": 65536},
+	}
+	path := writeTempConfig(t, raw)
+
+	_, err := Load(path)
+	if err == nil {
+		t.Fatal("expected validation error for port 65536, got nil")
+	}
+}
+
 func TestLoad_MalformedJSON(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "bad.json")
 	if err := os.WriteFile(path, []byte("{bad json"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	_, err := Load(path)
-	if err == nil {
-		t.Fatal("expected parse error, got nil")
-	}
-}
+	_, err 
