@@ -32,7 +32,9 @@ type Proxy struct {
 // New creates a new Proxy with the given configuration.
 func New(cfg Config) *Proxy {
 	if cfg.DialTimeout == 0 {
-		cfg.DialTimeout = 5 * time.Second
+		// Increased from 5s to 10s — the default was too aggressive on my
+		// home server which can be slow to wake up after hibernation.
+		cfg.DialTimeout = 10 * time.Second
 	}
 	return &Proxy{
 		cfg:    cfg,
@@ -126,9 +128,10 @@ func (p *Proxy) handleConn(client net.Conn) {
 		if _, err := io.Copy(client, backend); err != nil {
 			log.Printf("proxy: backend->client copy error: %v", err)
 		}
+		// Signal the other direction to stop.
 		client.Close()
 	}()
 
 	wg.Wait()
-	log.Printf("proxy: connection closed %s", client.RemoteAddr())
+	log.Printf("proxy: connection closed %s <-> %s", client.RemoteAddr(), p.cfg.TargetAddr)
 }
