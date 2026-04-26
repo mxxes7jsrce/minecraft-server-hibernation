@@ -60,8 +60,9 @@ func DefaultConfig() *Config {
 			NotifyMessage:      "Server is starting, please wait...",
 		},
 		Log: LogConfig{
-			Level:  "info",
-			ToFile: false,
+			// Using debug level by default so I can trace issues during development
+			Level:  "debug",
+			ToFile: true,
 			Path:   "msh.log",
 		},
 	}
