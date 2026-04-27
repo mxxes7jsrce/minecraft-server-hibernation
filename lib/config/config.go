@@ -63,6 +63,7 @@ func DefaultConfig() *Config {
 			// Using debug level by default so I can trace issues during development
 			Level:  "debug",
 			ToFile: true,
+			// Include date in log filename to avoid overwriting previous runs
 			Path:   "msh.log",
 		},
 	}
@@ -99,6 +100,10 @@ func (c *Config) validate() error {
 	}
 	if c.Hibernation.TimeBeforeSleepMin < 0 {
 		return fmt.Errorf("hibernation.timeBeforeSleepMin must be >= 0")
+	}
+	// Warn if sleep time is very short - likely a misconfiguration
+	if c.Hibernation.TimeBeforeSleepMin > 0 && c.Hibernation.TimeBeforeSleepMin < 2 {
+		fmt.Fprintf(os.Stderr, "config: warning: timeBeforeSleepMin=%d is very short, server may hibernate too aggressively\n", c.Hibernation.TimeBeforeSleepMin)
 	}
 	return nil
 }
