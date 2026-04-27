@@ -106,8 +106,9 @@ func (m *Manager) Start() error {
 		_ = cmd.Wait()
 		m.mu.Lock()
 		// Log uptime when the server process exits, useful for tracking session lengths.
+		// Rounding to the nearest second is good enough for my purposes.
 		uptime := time.Since(m.startedAt).Round(time.Second)
-		fmt.Printf("server process exited after %s\n", uptime)
+		fmt.Printf("server process exited after %s (started at %s)\n", uptime, m.startedAt.Format(time.RFC3339))
 		m.state = StateStopped
 		m.process = nil
 		m.mu.Unlock()
@@ -119,12 +120,3 @@ func (m *Manager) Start() error {
 // Stop sends an interrupt signal to the Minecraft server process.
 // Returns an error if the server is not currently running or starting.
 func (m *Manager) Stop() error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	if m.state == StateStopped || m.state == StateStopping {
-		return fmt.Errorf("cannot stop server: current state is %s", m.state)
-	}
-
-	if m.process == nil {
-		r
